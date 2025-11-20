@@ -15,15 +15,22 @@ Clang: LLVM/build/bin/clang
 QEMU:  BE_RISCV/qemu/build/qemu-riscv64be
 LIT:   LLVM/build/bin/llvm-lit
 
--- Testing: 3 tests, 3 workers --
-PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/exit_code.c (1 of 3)
-PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/hello.c (2 of 3)
-PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/data_endian.c (3 of 3)
+-- Testing: 10 tests, 10 workers --
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/arithmetic.c (1 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/bitwise.c (2 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/branches.c (3 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/data_endian.c (4 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/exit_code.c (5 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/function_calls.c (6 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/hello.c (7 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/memory_ops.c (8 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/pointer_ops.c (9 of 10)
+PASS: RISC-V Big-Endian Test Suite :: tests/nostdlib/struct_layout.c (10 of 10)
 
-Testing Time: 0.08s
+Testing Time: 0.13s
 
-Total Discovered Tests: 3
-  Passed: 3 (100.00%)
+Total Discovered Tests: 10
+  Passed: 10 (100.00%)
 
 ```
 
@@ -112,10 +119,25 @@ void _start() {
 ## Current Test Categories
 
 ### nostdlib Tests
-Tests that don't require standard library, using direct syscalls:
-- **hello.c** - Basic execution and output
-- **exit_code.c** - Exit code propagation
-- **data_endian.c** - Verify big-endian data storage
+Tests that don't require standard library, using direct syscalls (10 tests):
+
+**Basic Tests:**
+- **hello.c** - Basic execution and stdout output verification
+- **exit_code.c** - Exit code propagation test
+- **data_endian.c** - Verify big-endian data storage format
+
+**Arithmetic & Logic:**
+- **arithmetic.c** - Basic arithmetic operations (add, sub, mul, div)
+- **bitwise.c** - Bitwise operations (and, or, xor, shift left/right)
+
+**Memory Operations:**
+- **memory_ops.c** - Memory load/store with various sizes (byte, halfword, word, doubleword)
+- **struct_layout.c** - Structure member access and layout verification
+- **pointer_ops.c** - Pointer arithmetic and array indexing
+
+**Control Flow:**
+- **branches.c** - Conditional branches and comparisons (eq, ne, lt, le, gt, ge)
+- **function_calls.c** - Function calls with 2, 4, and 8 arguments (register and stack passing)
 
 ### stdlib Tests (TODO)
 Tests using standard library functions.
