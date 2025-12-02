@@ -1,12 +1,16 @@
 // Test exit code propagation
 //
-// REQUIRES: gcc
-// RUN: %gcc -nostdlib -static -mbig-endian -O2 -march=rv64gc %s -o %t-gcc.out
-// RUN: %qemu %t-gcc.out; test $? -eq 42
+// REQUIRES: gcc || clang
 //
-// REQUIRES: clang
-// RUN: %clang -nostdlib -static -fuse-ld=lld -target riscv64-unknown-linux-gnu -mbig-endian -O2 -march=rv64gc %s -o %t-clang.out
-// RUN: %qemu %t-clang.out; test $? -eq 42
+// RUN: %if gcc %{ \
+// RUN:   %gcc -nostdlib -static -mbig-endian -O2 -march=rv64gc %s -o %t-gcc.out && \
+// RUN:   %qemu %t-gcc.out ; test $? -eq 42 \
+// RUN: %}
+// RUN: %if clang %{ \
+// RUN:   %clang -nostdlib -static -fuse-ld=lld -target riscv64-unknown-linux-gnu \
+// RUN:     -mbig-endian -O2 -march=rv64gc %s -o %t-clang.out && \
+// RUN:   %qemu %t-clang.out ; test $? -eq 42 \
+// RUN: %}
 
 #define SYS_exit 93
 
