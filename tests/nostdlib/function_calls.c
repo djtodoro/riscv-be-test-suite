@@ -1,12 +1,16 @@
 // Test function calls and argument passing
 //
-// REQUIRES: gcc
-// RUN: %gcc -nostdlib -static -mbig-endian -O2 -march=rv64gc %s -o %t-gcc.out
-// RUN: %qemu %t-gcc.out | FileCheck %s
+// REQUIRES: gcc || clang
 //
-// REQUIRES: clang
-// RUN: %clang -nostdlib -static -fuse-ld=lld -target riscv64-unknown-linux-gnu -mbig-endian -O2 -march=rv64gc %s -o %t-clang.out
-// RUN: %qemu %t-clang.out | FileCheck %s
+// RUN: %if gcc %{ \
+// RUN:   %gcc -nostdlib -static -mbig-endian -O2 -march=rv64gc %s -o %t-gcc.out && \
+// RUN:   %qemu %t-gcc.out | FileCheck %s \
+// RUN: %}
+// RUN: %if clang %{ \
+// RUN:   %clang -nostdlib -static -fuse-ld=lld -target riscv64-unknown-linux-gnu \
+// RUN:          -mbig-endian -O2 -march=rv64gc %s -o %t-clang.out && \
+// RUN:   %qemu %t-clang.out | FileCheck %s \
+// RUN: %}
 //
 // CHECK: add_two: 0000000000000037
 // CHECK: add_four: 00000000000000a6

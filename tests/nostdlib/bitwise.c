@@ -1,12 +1,15 @@
 // Test bitwise operations in big-endian mode
+// REQUIRES: gcc || clang
 //
-// REQUIRES: gcc
-// RUN: %gcc -nostdlib -static -mbig-endian -O2 -march=rv64gc %s -o %t-gcc.out
-// RUN: %qemu %t-gcc.out | FileCheck %s
-//
-// REQUIRES: clang
-// RUN: %clang -nostdlib -static -fuse-ld=lld -target riscv64-unknown-linux-gnu -mbig-endian -O2 -march=rv64gc %s -o %t-clang.out
-// RUN: %qemu %t-clang.out | FileCheck %s
+// RUN: %if gcc %{ \
+// RUN:   %gcc -nostdlib -static -mbig-endian -O2 -march=rv64gc %s -o %t-gcc.out && \
+// RUN:   %qemu %t-gcc.out | FileCheck %s \
+// RUN: %}
+// RUN: %if clang %{ \
+// RUN:   %clang -nostdlib -static -fuse-ld=lld -target riscv64-unknown-linux-gnu \
+// RUN:          -mbig-endian -O2 -march=rv64gc %s -o %t-clang.out && \
+// RUN:   %qemu %t-clang.out | FileCheck %s \
+// RUN: %}
 //
 // CHECK: and: 0000000012345678
 // CHECK: or: 00000000ffff7fff

@@ -28,27 +28,28 @@ clang_path = os.environ.get('RISCV_BE_CLANG')
 qemu_path = os.environ.get('RISCV_BE_QEMU')
 
 # Check that required environment variables are set
-if not gcc_path:
-    lit_config.fatal('RISCV_BE_GCC environment variable must be set')
-if not clang_path:
-    lit_config.fatal('RISCV_BE_CLANG environment variable must be set')
+if not gcc_path and not clang_path:
+    lit_config.fatal('Either RISCV_BE_GCC or RISCV_BE_CLANG ' \
+                     'environment variable must be set');
 if not qemu_path:
     lit_config.fatal('RISCV_BE_QEMU environment variable must be set')
 
 # Verify paths exist
 def check_tool(name, path):
+    if not path:
+        lit_config.note(f'{name} not set')
+        return False
+
     if not os.path.exists(path):
-        lit_config.warning(f'{name} not found at: {path}')
-        lit_config.note(f'Set {name.upper().replace(" ", "_")}_PATH environment variable')
+        lit_config.fatal(f'{name} not found at: {path}')
         return False
     return True
 
-gcc_available = check_tool('GCC', gcc_path)
-clang_available = check_tool('Clang', clang_path)
-qemu_available = check_tool('QEMU', qemu_path)
+tools = ['GCC', 'Clang', 'QEMU']
+tool_paths = [gcc_path, clang_path, qemu_path]
 
-if not qemu_available:
-    lit_config.fatal('QEMU is required to run tests')
+available_tools = [t for t in zip(tools, tool_paths)
+                   if check_tool(t[0], t[1])];
 
 # Find FileCheck
 filecheck_path = os.path.join(os.path.dirname(clang_path), 'FileCheck')
@@ -57,26 +58,20 @@ if not os.path.exists(filecheck_path):
     if not filecheck_path:
         lit_config.fatal('FileCheck not found')
 
-# Add substitutions for use in RUN lines
-config.substitutions.append(('%gcc', gcc_path))
-config.substitutions.append(('%clang', clang_path))
-config.substitutions.append(('%qemu', qemu_path))
 # Note: LIT automatically provides %t as a unique temporary file path per test
 config.substitutions.append(('FileCheck', filecheck_path))
 
 # Common compiler flags
 gcc_flags = '-nostdlib -static -EB -O2 -march=rv64gc'
-clang_flags = '-nostdlib -static -target riscv64-unknown-linux-gnu -mbig-endian -O2 -march=rv64gc'
+clang_flags = '-nostdlib -static -target riscv64-unknown-linux-gnu ' \
+              '-mbig-endian -O2 -march=rv64gc'
 
 config.substitutions.append(('%gcc_flags', gcc_flags))
 config.substitutions.append(('%clang_flags', clang_flags))
 
 # Features based on tool availability
-if gcc_available:
-    config.available_features.add('gcc')
-if clang_available:
-    config.available_features.add('clang')
-
-lit_config.note(f'GCC: {gcc_path} (available: {gcc_available})')
-lit_config.note(f'Clang: {clang_path} (available: {clang_available})')
-lit_config.note(f'QEMU: {qemu_path} (available: {qemu_available})')
+for tool in available_tools:
+    config.available_features.add(str(tool[0]).lower())
+    # Add substitutions for use in RUN lines
+    config.substitutions.append(('%' + str(tool[0]).lower(),
+                                 str(tool[1])))

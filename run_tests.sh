@@ -2,15 +2,9 @@
 # Convenience script to run the RISC-V big-endian test suite
 
 # Check that required environment variables are set
-if [ -z "$RISCV_BE_GCC" ]; then
-    echo "Error: RISCV_BE_GCC environment variable is not set"
+if [ -z "$RISCV_BE_GCC" ] && [ -z "$RISCV_BE_CLANG" ]; then
+    echo "Error: Both RISCV_BE_GCC and RISCV_BE_CLANG environment variable are not set"
     echo "Example: export RISCV_BE_GCC=/path/to/riscv64-mti-linux-gnu-gcc"
-    exit 1
-fi
-
-if [ -z "$RISCV_BE_CLANG" ]; then
-    echo "Error: RISCV_BE_CLANG environment variable is not set"
-    echo "Example: export RISCV_BE_CLANG=/path/to/clang"
     exit 1
 fi
 
@@ -33,8 +27,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "RISC-V Big-Endian Test Suite"
 echo "============================="
-echo "GCC:   $RISCV_BE_GCC"
-echo "Clang: $RISCV_BE_CLANG"
+if [ -n "$RISCV_BE_GCC" ]; then
+    echo "GCC:   $RISCV_BE_GCC"
+fi
+if [ -n "$RISCV_BE_CLANG" ]; then
+    echo "Clang: $RISCV_BE_CLANG"
+fi
 echo "QEMU:  $RISCV_BE_QEMU"
 echo "LIT:   $LLVM_LIT"
 echo ""
